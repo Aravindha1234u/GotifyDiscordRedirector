@@ -1,0 +1,15 @@
+version: "3.8"
+
+services:
+  gotify-discord:
+    container_name: GotifyDiscordRedirector
+    image: aravindha1234u/gotifydiscordredirector:latest
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      GOTIFY_WS_URL: "ws://your-gotify-url/stream?token=your-token"
+      DISCORD_WEBHOOK_URL: "https://discord.com/api/webhooks/your-webhook-id/your-webhook-token"
+    # Or, if you prefer command-line arguments:
+    # command: ["--gotify", "ws://your-gotify-url/stream?token=your-token", "--discord", "https://discord.com/api/webhooks/your-webhook-id/your-webhook-token"]
+    restart: unless-stopped
