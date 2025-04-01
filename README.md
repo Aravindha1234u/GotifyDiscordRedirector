@@ -36,3 +36,120 @@ You can configure the Gotify and Discord URLs using either environment variables
 ### Command-Line Arguments
 * `-gotify`: The Gotify WebSocket URL.
 * `-discord`: Your Discord webhook URL.
+
+## Installation
+
+### Binary Release
+1.  Navigate to the [GitHub Releases](https://github.com/Aravindha1234u/GotifyDiscordRedirector/releases) page.
+2.  Download the appropriate binary for your operating system and architecture.
+3.  Make the binary executable (if necessary): `chmod +x GotifyDiscordRedirector`.
+4.  Run the binary: `./GotifyDiscordRedirector -gotify="ws://your-gotify-url/stream?token=your-token" -discord="https://discord.com/api/webhooks/your-webhook-id/your-webhook-token"`.
+
+### Linux Service (systemd)
+To run the `GotifyDiscordRedirector` binary as a background service on Linux using `systemd`, follow these steps:
+
+1.  **Create a Service User (Recommended):**
+```bash
+sudo adduser --system --group --no-create-home gotify-discord
+```
+
+2.  **Copy the Binary:**
+Copy the `GotifyDiscordRedirector` binary to a suitable location, such as `/opt/`:
+
+```bash
+sudo cp GotifyDiscordRedirector /opt/
+sudo chown gotify-discord:gotify-discord /opt/GotifyDiscordRedirector
+```
+
+3.  **Create the systemd Service File:**
+Create a service file at `/etc/systemd/system/gotify-discord.service`:
+
+```ini
+[Unit]
+Description=Gotify to Discord Forwarder
+After=network.target
+
+[Service]
+User=gotify-discord
+Group=gotify-discord
+ExecStart=/opt/GotifyDiscordRedirector -gotify="ws://your-gotify-url/stream?token=your-token" -discord="https://discord.com/api/webhooks/your-webhook-id/your-webhook-token"
+Restart=always
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target
+```
+
+**Important:** Replace the appropriate command-line flags or ensure the environment variables are set in the systemd environment.
+
+4.  **Reload systemd and Enable the Service:**
+```bash
+sudo systemctl daemon-reload
+sudo systemctl enable gotify-discord.service
+```
+
+5.  **Start the Service:**
+```bash
+sudo systemctl start gotify-discord.service
+```
+
+6.  **Check the Service Status:**
+```bash
+sudo systemctl status gotify-discord.service
+```
+
+7.  **View Logs:**
+```bash
+sudo journalctl -u gotify-discord.service
+```
+
+### Docker Image
+1.  Pull the Docker image from the Container Registry (GCR): `docker pull aravindha1234u/gotifydiscordredirector:latest`.
+2.  Run the Docker container, providing the necessary environment variables:
+```bash
+sudo docker run -e GOTIFY_WS_URL="ws://your-gotify-url/stream?token=your-token" -e DISCORD_WEBHOOK_URL="https://discord.com/api/webhooks/your-webhook-id/your-webhook-token" aravindha1234u/gotifydiscordredirector:latest
+```
+
+## Build
+
+### Prerequisites
+* Go (1.18 or later)
+* Docker (for containerization)
+* Gotify server
+* Discord webhook URL
+
+### Build from Source
+1.  Clone the repository:
+```bash
+git clone https://github.com/Aravindha1234u/GotifyDiscordRedirector.git
+cd GotifyDiscordRedirector
+```
+
+2.  Install dependencies:
+```bash
+go mod download
+```
+
+3.  Build the application:
+```bash
+go build
+```
+
+4.  Run the application:
+```bash
+./GotifyDiscordRedirector -gotify="ws://your-gotify-url/stream?token=your-token" -discord="https://discord.com/api/webhooks/your-webhook-id/your-webhook-token"
+```
+
+### Build Docker Image
+
+1.  Clone the repository (if you haven't already).
+2.  Navigate to the project directory.
+3.  Build the Docker image:
+```bash
+docker build -t GotifyDiscordRedirector .
+```
+
+4.  Run the Docker container, providing the necessary environment variables:
+```bash
+docker run -e GOTIFY_WS_URL="ws://your-gotify-url/stream?token=your-token" -e DISCORD_WEBHOOK_URL="https://discord.com/api/webhooks/your-webhook-id/your-webhook-token" GotifyDiscordRedirector
+```
